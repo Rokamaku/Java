@@ -1,49 +1,28 @@
 import java.util.*;
 import java.io.*;
 
-public class blockWorld {
+public class blocksWorld {
 	private static Scanner scanIn;
 	private static List<String> goal = new ArrayList<String>();
 	private static List<List<String>> opPath = new ArrayList<List<String>>();
+	private static int recurCall = 0; 
 	public static void main(String[] args) throws FileNotFoundException
 	{
 		scanIn = new Scanner(System.in);
-		//String filename = "";
+		String filename = null;
 		System.out.println("Blocks world program by Bui Hoang Anh");
-		//System.out.print("Enter an input file: \n");
-		//filename = scanIn.nextLine();
-		FileInputStream	fis = new FileInputStream("/home/parakoda/Input.txt");
+		System.out.print("Enter an input file: ");
+		filename = scanIn.nextLine();
+		FileInputStream	fis = new FileInputStream(filename);
 		scanIn = new Scanner(fis);
 		List<String> initWorld = new ArrayList<String>();
-		//List<Block> blStack = new ArrayList<Block>();
-		//List<Integer> canMove = new ArrayList<Integer>();
 		String line = null;
-		//int curStack = 0;
 		while (!(line = scanIn.nextLine()).isEmpty())
 		{
-			//System.out.println(scanIn.nextLine());
 			String str = line.substring(line.indexOf('.')+1);
 			String spot = str.trim();
-			/*if (spot != ""){
-				/*for (int i = 0; i < spot.length(); i++)
-				{
-					/*Block eachBl = new Block();
-					eachBl.ch = spot.charAt(i);
-					if (i == spot.length() - 1)
-						eachBl.isClear = true;
-					eachBl.pStack =  curStack;
-					blStack.add(eachBl);
-				}
-				//canMove.add(curStack);
-			}*/
 			initWorld.add(spot);
-			//curStack++;
 		}
-		/*Iterator<String> ite = initWorld.iterator();
-		while (ite.hasNext())
-		{
-			System.out.println(ite.next());
-		}*/
 		while (scanIn.hasNextLine())
 		{
 			line = scanIn.nextLine();
@@ -51,13 +30,9 @@ public class blockWorld {
 			String spot = str.trim();
 			goal.add(spot);
 		}
-		/*Iterator<String> ite = goal.iterator();
-		while (ite.hasNext())
-		{
-			System.out.println(ite.next());
-		}*/
 		iteraDeepSearch(initWorld);
-		for (int i = 0; i < opPath.size(); i++)
+		opPath.add(initWorld);
+		for (int i = opPath.size() - 1 ; i >= 0; i--)
 		{
 			List<String> node = new ArrayList<String>(opPath.get(i));
 			for (int j = 0; j < node.size(); j++)
@@ -66,6 +41,8 @@ public class blockWorld {
 			}
 			System.out.println();
 		}
+		System.out.println("Optimal solution has " + (opPath.size() - 1) + " moves");
+		System.out.println(recurCall + " total recursive calls");
 	}
 	public static void iteraDeepSearch(List<String> initWorld)
 	{
@@ -78,10 +55,7 @@ public class blockWorld {
 	public static boolean depthLimitSearch(List<String> node, int limit)
 	{
 		if (testGoal(node))
-		{
-			opPath.add(node);
 			return true;
-		}
 		if (limit <= 0)
 			return false;
 		List<Integer> canMove = new ArrayList<Integer>();
@@ -102,9 +76,12 @@ public class blockWorld {
 				newNode.set(j, newNode.get(j) + moveBl);
 				if (depthLimitSearch(newNode, limit - 1))
 				{
+					recurCall++;
 					opPath.add(newNode);
 					return true;
 				}
+				else
+					recurCall++;
 			}
 			
 		}
@@ -121,19 +98,4 @@ public class blockWorld {
 		}
 		return true;
 	}
-	
 }
-
-/*class Block {
-	Block() {
-		isClear = false;
-	}
-	Block(Block other){
-		ch = other.ch;
-		isClear = other.isClear;
-		pStack = other.pStack;
-	}
-	char ch;
-	boolean isClear;
-	int pStack;
-}*/
